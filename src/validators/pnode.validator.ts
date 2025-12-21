@@ -1,0 +1,13 @@
+import { z } from 'zod';
+
+/**
+ * Schema for batch pod accessibility check
+ */
+export const batchPodCheckSchema = z.object({
+  endpoints: z
+    .array(z.string())
+    .min(1, 'At least one pod is required')
+    .max(400, 'Maximum 400 pods can be checked at once'),
+});
+
+export type BatchPodCheckInput = z.infer<typeof batchPodCheckSchema>;
