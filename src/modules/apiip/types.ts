@@ -65,8 +65,8 @@ export const ipInfoSchema = z.object({
     website: z.string().optional(),
     abuseEmail: z.string().optional(),
     type: z.string(),
-    created: z.string(),
-    updated: z.string(),
+    created: z.string().optional(),
+    updated: z.string().optional(),
     rir: z.string(),
   }).optional(),
   security: z.object({

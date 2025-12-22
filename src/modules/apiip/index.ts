@@ -184,8 +184,8 @@ export async function getIpInfo(ip: string) {
 
   // Validate response structure with Zod
   const validationResult = ipInfoResponseSchema.safeParse(rawData);
-
   if (!validationResult.success) {
+    console.log('validation result:', validationResult.error, rawData);
     throw new ValidationError(
       'Invalid IP info response format from apiip.net',
       validationResult.error
