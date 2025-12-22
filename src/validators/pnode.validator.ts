@@ -11,3 +11,11 @@ export const batchPodCheckSchema = z.object({
 });
 
 export type BatchPodCheckInput = z.infer<typeof batchPodCheckSchema>;
+
+export const runCommandQueryCheckSchema = z.object({
+    command: z.string(),
+});
+
+export const runCommandQueryParamCheckSchema = z.object({
+    endpoint: z.string().optional()
+});

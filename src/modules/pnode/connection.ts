@@ -1,6 +1,6 @@
 import { ValidationError, ExternalAPIError, RPCError } from "@/errors";
 import { randomUUID } from "crypto";
-import { Stats, statsSchema, PodsWithStats, podsWithStatsSchema, jsonRpcResponseSchema, JsonRpcResponse } from "./types";
+import { Stats, statsSchema, PodsWithStats, podsWithStatsSchema, jsonRpcResponseSchema, JsonRpcResponse, Version, versionSchema, Pods, podsSchema } from "./types";
 import { request } from "@/modules/http/curl-client";
 
 export class Connection {
@@ -30,6 +30,34 @@ export class Connection {
         if (!validation.success) {
             throw new ValidationError(
                 `Invalid pods-with-stats response format from RPC method 'get-pods-with-stats'`,
+                validation.error
+            );
+        }
+
+        return validation.data;
+    }
+
+    async getVersion(): Promise<Version> {
+        const result = await this._makeRpcRequest<Version>("get-version");
+
+        const validation = versionSchema.safeParse(result);
+        if (!validation.success) {
+            throw new ValidationError(
+                `Invalid stats response format from RPC method 'get-version'`,
+                validation.error
+            );
+        }
+
+        return validation.data;
+    }
+
+    async getPods(): Promise<Pods> {
+        const result = await this._makeRpcRequest<Pods>("get-pods");
+
+        const validation = podsSchema.safeParse(result);
+        if (!validation.success) {
+            throw new ValidationError(
+                `Invalid stats response format from RPC method 'get-pods'`,
                 validation.error
             );
         }

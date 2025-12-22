@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { 
-  isPodAccessible, 
-  getPodsCredit, 
+import {
+  isPodAccessible,
+  getPodsCredit,
   Connection as PnodeConnection,
   type RootNodeInfo,
   type LeafNodeInfo,
@@ -13,7 +13,65 @@ import { PodAccessibility } from '@/models/PodAccessibility.model';
 import { getIpInfo } from '@/modules/apiip';
 import { config } from '@/config';
 
+/**
+ * Run a pnode command (get-stats, get-pods, get-pods-with-stats, get-version)
+ */
 const RPC_PORT = 6000;
+export const runPnodeCommand = async (
+  req: TypedRequest<{ command: string, endpoint?: string }>,
+  res: Response
+): Promise<void> => {
+  const { command } = req.params;
+  const { endpoint } = req.query;
+  const connection = new PnodeConnection(config.pnodeClusterApi);
+
+  try {
+    let result;
+    switch (command) {
+      case 'get-stats': {
+        const [, host] = /(.+?):.+/.exec(endpoint!) ?? [];
+        if (!host) {
+          res.status(StatusCodes.BAD_REQUEST).json({
+            status: 'fail',
+            message: `Invalid endpoint provided: ${endpoint}`
+          });
+
+          return;
+        }
+        
+        const url = `http://${host}:${RPC_PORT}/rpc`;
+        const connection = new PnodeConnection(url);
+        result = await connection.getStats();
+        break;
+      }
+      case 'get-pods':
+        result = await connection.getPods();
+        break;
+      case 'get-pods-with-stats':
+        result = await connection.getPodsWithStats();
+        break;
+      case 'get-version':
+        result = await connection.getVersion();
+        break;
+      default:
+        res.status(StatusCodes.BAD_REQUEST).json({
+          status: 'fail',
+          message: `Unknown command: ${command}`
+        });
+        return;
+    }
+
+    res.status(StatusCodes.OK).json({
+      status: 'success',
+      data: result,
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: 'error',
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
 
 /**
  * Batch check pod accessibility and store results
@@ -102,8 +160,8 @@ export const getRootNodeInfo = async (
   const totalStorageCommitted = pods.reduce((sum, pod) => sum + pod.storage_committed, 0);
   const totalStorageUsed = pods.reduce((sum, pod) => sum + pod.storage_used, 0);
   const averageStoragePerPod = totalPods > 0 ? totalStorageCommitted / totalPods : 0;
-  const utilizationRate = totalStorageCommitted > 0 
-    ? (totalStorageUsed / totalStorageCommitted) * 100 
+  const utilizationRate = totalStorageCommitted > 0
+    ? (totalStorageUsed / totalStorageCommitted) * 100
     : 0;
 
   let totalCredits: number | undefined;
@@ -147,7 +205,7 @@ export const getLeafNodesInfo = async (
     const creditsData = await getPodsCredit();
     const sortedCredits = creditsData.pods_credits
       .sort((a, b) => b.credits - a.credits);
-    
+
     sortedCredits.forEach((pc) => {
       creditsMap.set(pc.pod_id, pc.credits);
     });
@@ -178,15 +236,15 @@ export const getLeafNodesInfo = async (
 
     let accessibleNodeDetail;
     let isAccessible = false;
-    
+
     if (ipAddress) {
       try {
         isAccessible = await isPodAccessible(pod.address, pod.pubkey);
-        
+
         if (isAccessible) {
           const podConnection = new PnodeConnection(`http://${ipAddress}:${RPC_PORT}/rpc`);
           const stats = await podConnection.getStats();
-          
+
           accessibleNodeDetail = {
             cpu_usage: stats.cpu_percent,
             total_storage_size: stats.file_size,

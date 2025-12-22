@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { catchAsync, validateZod } from '@/middleware';
 import * as pnodeController from '@/controllers/pnode.controller';
-import { batchPodCheckSchema } from '@/validators/pnode.validator';
+import { batchPodCheckSchema, runCommandQueryCheckSchema, runCommandQueryParamCheckSchema } from '@/validators/pnode.validator';
 
 const router = Router();
 
@@ -11,9 +11,9 @@ const router = Router();
  * @access  Public
  */
 router.post(
-  '/check-batch',
-  validateZod({ body: batchPodCheckSchema }),
-  catchAsync(pnodeController.batchCheckPodAccessibility)
+    '/check-batch',
+    validateZod({ body: batchPodCheckSchema }),
+    catchAsync(pnodeController.batchCheckPodAccessibility)
 );
 
 /**
@@ -34,7 +34,17 @@ router.get('/root', catchAsync(pnodeController.getRootNodeInfo));
  * @route   GET /api/v1/pnode/leaf/
  * @desc    Get leaf nodes information
  * @access  Public
- */
+*/
 router.get('/leaf', catchAsync(pnodeController.getLeafNodesInfo));
 
+/**
+ * @route   GET /api/v1/pnode/run-command/:command
+ * @desc    Run a pnode command (get-stats, get-pods, get-pods-with-stats, get-version)
+ * @access  Public
+ */
+router.get(
+    '/run-command/:command',
+    validateZod({ params: runCommandQueryCheckSchema, query: runCommandQueryParamCheckSchema }), 
+    catchAsync(pnodeController.runPnodeCommand)
+);
 export default router;

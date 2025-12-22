@@ -95,6 +95,24 @@ export const podsCreditsSchema = z.object({
 export type PodCredit = z.infer<typeof podCreditSchema>;
 export type PodsCredits = z.infer<typeof podsCreditsSchema>;
 
+export const versionSchema = z.object({
+    version: z.string()
+});
+
+export type Version = z.infer<typeof versionSchema>;
+
+export const podsSchema = z.object({
+    pods: z.array(z.object({
+        address: z.string(),
+        last_seen_timestamp: z.number(),
+        pubkey: z.string().nullable(),
+        version: z.string()
+    })),
+    total_count: z.number()
+});
+
+export type Pods = z.infer<typeof podsSchema>;
+
 /**
  * IP Address detail schema
  */
