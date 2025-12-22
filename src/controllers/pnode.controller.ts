@@ -18,18 +18,19 @@ import { config } from '@/config';
  */
 const RPC_PORT = 6000;
 export const runPnodeCommand = async (
-  req: TypedRequest<{ command: string, endpoint?: string }>,
+  req: TypedRequest<{ command: string, endpoint: string }>,
   res: Response
 ): Promise<void> => {
   const { command } = req.params;
   const { endpoint } = req.query;
-  const connection = new PnodeConnection(config.pnodeClusterApi);
-
+  const [, host] = /(.+?):.+/.exec(endpoint!) ?? [];
+  const url = `http://${host}:${RPC_PORT}/rpc`;
+  const connection = new PnodeConnection(url);
+  
   try {
     let result;
     switch (command) {
       case 'get-stats': {
-        const [, host] = /(.+?):.+/.exec(endpoint!) ?? [];
         if (!host) {
           res.status(StatusCodes.BAD_REQUEST).json({
             status: 'fail',
@@ -38,9 +39,7 @@ export const runPnodeCommand = async (
 
           return;
         }
-        
-        const url = `http://${host}:${RPC_PORT}/rpc`;
-        const connection = new PnodeConnection(url);
+
         result = await connection.getStats();
         break;
       }

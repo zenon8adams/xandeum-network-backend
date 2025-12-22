@@ -17,5 +17,5 @@ export const runCommandQueryCheckSchema = z.object({
 });
 
 export const runCommandQueryParamCheckSchema = z.object({
-    endpoint: z.string().optional()
+    endpoint: z.string()
 });
