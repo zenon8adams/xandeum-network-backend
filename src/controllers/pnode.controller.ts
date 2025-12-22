@@ -158,7 +158,6 @@ export const getLeafNodesInfo = async (
   const leafNodesPromises = pods.map(async (pod) => {
     const ipMatch = pod.address.match(/^(\d+\.\d+\.\d+\.\d+)/);
     const ipAddress = ipMatch ? ipMatch[1] : null;
-    const isOnline = (Date.now() - pod.last_seen_timestamp * 1000) < 2000;
 
     let ipInfo;
     if (ipAddress) {
@@ -180,7 +179,7 @@ export const getLeafNodesInfo = async (
     let accessibleNodeDetail;
     let isAccessible = false;
     
-    if (ipAddress && isOnline) {
+    if (ipAddress) {
       try {
         isAccessible = await isPodAccessible(pod.address, pod.pubkey);
         

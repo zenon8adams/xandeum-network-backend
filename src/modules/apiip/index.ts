@@ -130,24 +130,26 @@ export async function getIpInfo(ip: string) {
   }
 
   if (isDBConnected()) {
-    const cached = await IpLookup.findOne({ 
+    const cached = await IpLookup.findOne({
       ip,
       expiresAt: { $gt: new Date() }
     });
 
     if (cached) {
-      return cached.data.data as IpInfoResponse['data'];
+      if (cached.data.data) {
+        return cached.data.data as IpInfoResponse['data'];
+      }
+      return cached.data as IpInfoResponse['data'];
     }
   }
 
-  // Fetch script path with caching (cached for 1 day)
   const scriptPath = await queryClient.fetchQuery({
     queryKey: ['scriptPath'],
     queryFn: getScriptFromPage,
   });
 
   const fullScriptPath = `${BASE_URL}${scriptPath}`;
-  
+
   // Fetch Google key with caching (cached for 1 day, keyed by script path)
   const code = await queryClient.fetchQuery({
     queryKey: ['googleKey', fullScriptPath],
@@ -194,7 +196,6 @@ export async function getIpInfo(ip: string) {
 
   const ipInfo = validationResult.data.data;
 
-  // Store in MongoDB if connected (cache for 7 days)
   if (isDBConnected()) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
