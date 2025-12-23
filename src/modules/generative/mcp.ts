@@ -23,7 +23,7 @@ class MongoQueryMCP {
     }[] = [];
     private static _instance: MongoQueryMCP | null = null; 
 
-    constructor(apiKey: string, model: string = "gemini-2.0-flash") {
+    constructor(apiKey: string, model: string = "gemini-2.5-flash") {
         this.genAI = new GoogleGenAI({ apiKey });
         this.server = new McpServer({
             name: "leafnode-query-server",

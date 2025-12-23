@@ -37,8 +37,9 @@ export const findBestLeafNodeEndpoint = async (
     return;
   }
 
+  const matchingEndpoints = validated.data.map(item => item.address.endpoint);
   res.status(StatusCodes.OK).json({
     status: 'success',
-    endpoints: validated.data.map(item => item.address.endpoint)
+    endpoints: [...new Set(matchingEndpoints)]
   });
 };

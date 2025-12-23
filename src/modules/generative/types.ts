@@ -61,7 +61,7 @@ leafNodeInfoSchema = {
     storage_committed: number, // Total storage committed by the node (bytes)
     storage_used: number, // Total storage currently used by the node (bytes)
     usage_percent: number, // Percentage of committed storage currently used
-    uptime: number, // Node uptime in seconds
+    uptime: number, // Node uptime in milliseconds
     version: string, // Software version running on the node
     credit?: number, // Credit score or balance for the node
     credit_rank?: number // Rank of the node based on credit score
