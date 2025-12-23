@@ -1,5 +1,7 @@
 import { Router } from 'express';
-import { catchAsync, validateZod } from '@/middleware';
+import { findBestLeafNodeEndpoint } from '@/controllers/pnode.generative.controller';
+import { validateZod, catchAsync } from '@/middleware';
+import { findBestLeafNodeEndpointSchema } from '@/validators/generative.validator';
 import * as pnodeController from '@/controllers/pnode.controller';
 import { batchPodCheckSchema, runCommandQueryCheckSchema, runCommandQueryParamCheckSchema } from '@/validators/pnode.validator';
 
@@ -47,4 +49,16 @@ router.get(
     validateZod({ params: runCommandQueryCheckSchema, query: runCommandQueryParamCheckSchema }), 
     catchAsync(pnodeController.runPnodeCommand)
 );
+
+/**
+ * @route   POST /api/v1/pnode/generative/find-best-leaf-endpoint
+ * @desc    Find the best matching leafNodeInfo.address.endpoint using generative AI
+ * @access  Public
+ */
+router.post(
+    '/generative/find-best-leaf-endpoint',
+    validateZod({ body: findBestLeafNodeEndpointSchema }),
+    catchAsync(findBestLeafNodeEndpoint)
+);
+
 export default router;

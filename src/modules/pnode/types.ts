@@ -117,12 +117,12 @@ export type Pods = z.infer<typeof podsSchema>;
  * IP Address detail schema
  */
 export const ipAddressDetailSchema = z.object({
-    continentCode: z.string(),
-    continentName: z.string(),
-    countryCode: z.string(),
-    countryName: z.string(),
-    latitude: z.number(),
-    longitude: z.number(),
+    continentCode: z.string().describe('Two-letter continent code (e.g., EU, NA, AS)'),
+    continentName: z.string().describe('Full continent name (e.g., Europe, North America)'),
+    countryCode: z.string().describe('Two-letter country code (ISO 3166-1 alpha-2, e.g., US, DE)'),
+    countryName: z.string().describe('Full country name (e.g., United States, Germany)'),
+    latitude: z.number().describe('Latitude of the IP address location'),
+    longitude: z.number().describe('Longitude of the IP address location'),
 });
 
 export type IpAddressDetail = z.infer<typeof ipAddressDetailSchema>;
@@ -145,32 +145,34 @@ export type RootNodeInfo = z.infer<typeof rootNodeInfoSchema>;
  * Leaf node information schema
  */
 export const leafNodeInfoSchema = z.object({
-    pubkey: z.string(),
-    is_registered: z.boolean(),
+    pubkey: z.string().describe('Unique public key identifier for the pod/node'),
+    is_registered: z.boolean().describe('Whether the node is registered in the network'),
     address: z.object({
-        endpoint: z.string(),
-        ip_info: ipAddressDetailSchema.optional(),
-    }),
+        endpoint: z.string().describe('Network endpoint address of the node (e.g., IP:port)'),
+        ip_info: ipAddressDetailSchema.optional().describe('Geolocation and network info for the endpoint IP'),
+    }).describe('Network address and geolocation info for the node'),
     accessible_node_detail: z.object({
-        cpu_usage: z.number(),
-        total_storage_size: z.number(),
-        packets_sent: z.number(),
-        packets_received: z.number(),
-        total_ram_available: z.number(),
-        total_ram_used: z.number(),
-        total_storage_allocated: z.number(),
-    }).optional(),
-    is_accessible: z.boolean(),
-    is_public: z.boolean(),
-    is_online: z.boolean(),
-    last_seen: z.number(),
-    storage_committed: z.number(),
-    storage_used: z.number(),
-    usage_percent: z.number(),
-    uptime: z.number(),
-    version: z.string(),
-    credit: z.number().optional(),
-    credit_rank: z.number().optional(),
+        cpu_usage: z.number().describe('Current CPU usage percentage'),
+        total_storage_size: z.number().describe('Total storage size available on the node (bytes)'),
+        packets_sent: z.number().describe('Number of network packets sent'),
+        packets_received: z.number().describe('Number of network packets received'),
+        total_ram_available: z.number().describe('Total RAM available on the node (bytes)'),
+        total_ram_used: z.number().describe('Total RAM currently used on the node (bytes)'),
+        total_storage_allocated: z.number().describe('Total storage allocated to the node (bytes)'),
+    }).optional().describe('Detailed resource usage stats if node is accessible'),
+    is_accessible: z.boolean().describe('Whether the node is currently accessible via network'),
+    is_public: z.boolean().describe('Whether the node is publicly accessible'),
+    is_online: z.boolean().describe('Whether the node is considered online (recently seen)'),
+    last_seen: z.number().describe('Timestamp (ms) when the node was last seen online'),
+    storage_committed: z.number().describe('Total storage committed by the node (bytes)'),
+    storage_used: z.number().describe('Total storage currently used by the node (bytes)'),
+    usage_percent: z.number().describe('Percentage of committed storage currently used'),
+    uptime: z.number().describe('Node uptime in seconds'),
+    version: z.string().describe('Software version running on the node'),
+    credit: z.number().optional().describe('Credit score or balance for the node'),
+    credit_rank: z.number().optional().describe('Rank of the node based on credit score'),
 });
 
 export type LeafNodeInfo = z.infer<typeof leafNodeInfoSchema>;
+
+export const leafNodeInfoArraySchema = z.array(leafNodeInfoSchema);

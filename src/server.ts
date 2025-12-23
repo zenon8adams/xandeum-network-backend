@@ -3,6 +3,7 @@ import app from './app';
 import { config } from '@/config';
 import { logger } from '@/utils';
 import { connectDB, disconnectDB } from '@/config/database';
+import MongoQueryMCP from '@/modules/generative/mcp';
 
 // Create HTTP server
 const server: Server = createServer(app);
@@ -11,8 +12,10 @@ const server: Server = createServer(app);
  * Start the server
  */
 const startServer = async (): Promise<void> => {
-  // Connect to MongoDB (optional - will skip if MONGODB_URI not set)
+  MongoQueryMCP.linkTools();
+  
   await connectDB();
+  await MongoQueryMCP.connect();
 
   server.listen(config.port, () => {
     logger.info(`🚀 Server is running on port ${config.port}`);

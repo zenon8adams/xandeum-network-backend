@@ -3,7 +3,6 @@ import path from 'path';
 import { z } from 'zod';
 import { ConfigurationError } from '@/errors';
 
-// Load environment variables from .env file
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 /**
@@ -31,8 +30,9 @@ const envSchema = z.object({
     .string()
     .default('100')
     .transform((val) => parseInt(val, 10)),
-  MONGODB_URI: z.string().url('MONGODB_URI must be a valid URL').optional(),
-  REFERENCE_PNODE_URL: z.string()
+  MONGODB_URI: z.string().url('MONGODB_URI must be a valid URL'),
+  REFERENCE_PNODE_URL: z.string(),
+  GENERATIVE_AI_API_KEY: z.string()
 });
 
 /**
@@ -68,8 +68,8 @@ export const config = {
   rateLimitWindowMs: env.RATE_LIMIT_WINDOW_MS,
   rateLimitMax: env.RATE_LIMIT_MAX,
   mongodbUri: env.MONGODB_URI,
-  pnodeClusterApi: env.REFERENCE_PNODE_URL
+  pnodeClusterApi: env.REFERENCE_PNODE_URL,
+  generativeAiApiKey: env.GENERATIVE_AI_API_KEY
 } as const;
 
-// Type export for TypeScript
 export type Config = typeof config;

@@ -12,6 +12,7 @@ import { BatchPodCheckInput } from '@/validators/pnode.validator';
 import { PodAccessibility } from '@/models/PodAccessibility.model';
 import { getIpInfo } from '@/modules/apiip';
 import { config } from '@/config';
+import { LeafNodeInfoModel } from "@/models/LeafNodeInfo.model";
 
 /**
  * Run a pnode command (get-stats, get-pods, get-pods-with-stats, get-version)
@@ -26,7 +27,7 @@ export const runPnodeCommand = async (
   const [, host] = /(.+?):.+/.exec(endpoint!) ?? [];
   const url = `http://${host}:${RPC_PORT}/rpc`;
   const connection = new PnodeConnection(url);
-  
+
   try {
     let result;
     switch (command) {
@@ -289,6 +290,20 @@ export const getLeafNodesInfo = async (
   });
 
   const leafNodes = await Promise.all(leafNodesPromises);
+
+  try {
+    await Promise.all(
+      leafNodes.map(async (node) => {
+        await LeafNodeInfoModel.findOneAndUpdate(
+          { pubkey: node.pubkey, 'address.endpoint': node.address.endpoint },
+          { ...node, queriedAt: new Date() },
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+      })
+    );
+  } catch (err) {
+    console.error('Failed to store leaf nodes for AI search:', err);
+  }
 
   res.status(StatusCodes.OK).json({
     status: 'success',

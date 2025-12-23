@@ -48,10 +48,6 @@ export const validateRequest = (validations: ValidationChain[]) => {
 /**
  * Middleware factory to validate request data using Zod schemas
  * Validates body, params, and query separately
- * 
- * @example
- * const schema = z.object({ email: z.string().email(), name: z.string().min(1) });
- * router.post('/users', validateZod({ body: schema }), async (req, res) => { ... });
  */
 export const validateZod = (schemas: {
   body?: ZodSchema;
