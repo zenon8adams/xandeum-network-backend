@@ -13,6 +13,7 @@ import { PodAccessibility } from '@/models/PodAccessibility.model';
 import { getIpInfo } from '@/modules/apiip';
 import { config } from '@/config';
 import { LeafNodeInfoModel } from "@/models/LeafNodeInfo.model";
+import { RootNodeInfoModel } from '@/models/RootNodeInfo.model';
 
 /**
  * Run a pnode command (get-stats, get-pods, get-pods-with-stats, get-version)
@@ -148,11 +149,24 @@ export const getCachedPodAccessibility = async (
  * Aggregates data from all pods including stats and credits
  */
 export const getRootNodeInfo = async (
-  _req: TypedRequest,
+  req: TypedRequest,
   res: Response
 ): Promise<void> => {
-  const connection = new PnodeConnection(config.pnodeClusterApi);
+  if (req.query && req.query.first_time) {
+    try {
+      const cached = await RootNodeInfoModel.findOne({}).sort({ queriedAt: -1 }).lean();
+      if (cached) {
+        res.status(StatusCodes.OK).json({
+          status: 'success',
+          data: cached,
+        });
+        return;
+      }
+    } catch (err) {
+    }
+  }
 
+  const connection = new PnodeConnection(config.pnodeClusterApi);
   const podsData = await connection.getPodsWithStats();
   const { pods } = podsData;
 
@@ -180,6 +194,16 @@ export const getRootNodeInfo = async (
     utilization_rate: utilizationRate,
     total_credits: totalCredits,
   };
+
+  try {
+    await RootNodeInfoModel.findOneAndUpdate(
+      {},
+      { ...rootInfo, queriedAt: new Date() },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  } catch (err) {
+    console.error('Failed to cache root node info:', err);
+  }
 
   res.status(StatusCodes.OK).json({
     status: 'success',

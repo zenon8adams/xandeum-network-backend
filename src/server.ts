@@ -1,9 +1,9 @@
 import { createServer, type Server } from 'http';
 import app from './app';
-import { config } from '@/config';
-import { logger } from '@/utils';
-import { connectDB, disconnectDB } from '@/config/database';
-import MongoQueryMCP from '@/modules/generative/mcp';
+import { config } from './config';
+import { logger } from './utils';
+import { connectDB, disconnectDB } from './config/database';
+import MongoQueryMCP from './modules/generative/mcp';
 
 // Create HTTP server
 const server: Server = createServer(app);
