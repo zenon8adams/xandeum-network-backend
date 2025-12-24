@@ -199,15 +199,17 @@ export const getLeafNodesInfo = async (
   if (req.query && req.query.first_time) {
     try {
       const allNodes = await LeafNodeInfoModel.find({}).lean();
-      res.status(StatusCodes.OK).json({
-        status: 'success',
-        data: {
-          total: allNodes.length,
-          nodes: allNodes,
-        },
-      });
-
-      return;
+      if(allNodes.length > 0) {
+        res.status(StatusCodes.OK).json({
+          status: 'success',
+          data: {
+            total: allNodes.length,
+            nodes: allNodes,
+          },
+        });
+  
+        return;
+      }
     } catch (err) {
       
     }
