@@ -21,9 +21,9 @@ class MongoQueryMCP {
             required: string[];
         };
     }[] = [];
-    private static _instance: MongoQueryMCP | null = null; 
+    private static _instance: MongoQueryMCP | null = null;
 
-    constructor(apiKey: string, model: string = "gemini-2.5-flash") {
+    constructor(apiKey: string, model: string = "gemini-2.0-flash") {
         this.genAI = new GoogleGenAI({ apiKey });
         this.server = new McpServer({
             name: "leafnode-query-server",
@@ -34,7 +34,7 @@ class MongoQueryMCP {
     }
 
     static getInstance() {
-        if(!MongoQueryMCP._instance) {
+        if (!MongoQueryMCP._instance) {
             MongoQueryMCP._instance = new MongoQueryMCP(config.generativeAiApiKey);
         }
 
@@ -102,17 +102,38 @@ class MongoQueryMCP {
             {
                 query: z.record(z.string(), z.any())
                     .describe("The leafnodeinfos query filter").optional().default({}),
+                timeFilter: z.object({
+                    field: z.string().describe("Field to filter by time (e.g., 'last_seen')"),
+                    lastSeconds: z.number().optional().describe("Find records from last N seconds"),
+                    lastMinutes: z.number().optional().describe("Find records from last N minutes"),
+                    lastHours: z.number().optional().describe("Find records from last N hours"),
+                }).optional().describe("Relative time filter"),
                 options: z.object({
-                    limit: z.number().optional().describe("Maximum number of documents to return"),
-                    skip: z.number().optional().describe("Number of documents to skip"),
+                    limit: z.number().optional(),
+                    skip: z.number().optional(),
                     sort: z.record(z.string(), z.any()).optional()
-                        .describe("Sort criteria (e.g. {field: 1} for ascending, {field: -1} for descending)")
                 }).optional().default({})
             },
             async (arg) => {
                 try {
-                    const { query, options } = arg;
-                    let cursor = LeafNodeInfoModel.find(query || {});
+                    let { query, timeFilter, options } = arg;
+                    query = query || {};
+                    if (timeFilter) {
+                        const now = Date.now();
+                        let cutoffTime = now;
+
+                        if (timeFilter.lastSeconds) {
+                            cutoffTime = now - (timeFilter.lastSeconds * 1000);
+                        } else if (timeFilter.lastMinutes) {
+                            cutoffTime = now - (timeFilter.lastMinutes * 60 * 1000);
+                        } else if (timeFilter.lastHours) {
+                            cutoffTime = now - (timeFilter.lastHours * 60 * 60 * 1000);
+                        }
+
+                        query[timeFilter.field] = { $gte: cutoffTime };
+                    }
+
+                    let cursor = LeafNodeInfoModel.find(query);
                     if (options) {
                         if (options.limit) cursor = cursor.limit(options.limit);
                         if (options.skip) cursor = cursor.skip(options.skip);
@@ -123,7 +144,7 @@ class MongoQueryMCP {
                         content: [
                             {
                                 type: "text",
-                                text: `Found ${results.length} documents in collection 'leafnodeinfos'`
+                                text: `Found ${results.length} documents`
                             },
                             {
                                 type: "text",
@@ -133,12 +154,10 @@ class MongoQueryMCP {
                     };
                 } catch (error: any) {
                     return {
-                        content: [
-                            {
-                                type: "text",
-                                text: `Error finding documents: ${error.message}`
-                            }
-                        ]
+                        content: [{
+                            type: "text",
+                            text: `Error finding documents: ${error.message}`
+                        }]
                     };
                 }
             }

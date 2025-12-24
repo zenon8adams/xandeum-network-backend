@@ -66,6 +66,50 @@ leafNodeInfoSchema = {
     credit?: number, // Credit score or balance for the node
     credit_rank?: number // Rank of the node based on credit score
 }
+
+This are more information about node versions:
+{
+    name: 'Reinheim', 
+    version: '0.8',
+    description: \`Reinheim (v0.8) is a focused, small release in Xandeum's South Era, delivering directory tree name searching via glob patterns to make large file systems significantly more navigable for sedApps and operators.\`
+},
+{ 
+    name: 'Heidelberg', 
+    version: '0.7',
+    color: '#14F195', 
+    description: \`Heidelberg (v0.7) advances Xandeum's South Era by introducing comprehensive paging statistics, enabling detailed monitoring and optimization of data pages in file systems.\`
+},
+{ 
+    name: 'Stuttgart', 
+    version: '0.6',
+    description: \`Stuttgart (v0.6) advances Xandeum's South Era by introducing redundancy mechanisms to the scalable storage layer for Solana, enhancing fault tolerance and data durability for smart contracts.\`
+},
+{ 
+    name: 'Ingolstadt', 
+    version: '0.5',
+    description: \`The Ingolstadt release in Xandeum's South Era shifts focus to reward tracking and performance incentives, introducing a heartbeat credit systems, useing metrics to assess pNode performance. \`
+},
+{ 
+    name: 'Herrenberg', 
+    version: '0.4',
+    description: \`Herrenberg shifted focus to enhanced communication, reliability, and tools for sedApps.\`
+},
+{ 
+    name: 'TryNet', 
+    version: '0.8.0-trynet.20251217111503.7a5b024',
+    description: 'Node for testing purposes'
+},
+{
+    name: 'TryNet',
+    version: '0.8.0-trynet.20251212183600.9eea72e',
+    description: 'Node for testing purposes'
+},
+{
+    name: 'Others',
+    version: 'Any other version',
+    description: 'Nodes running custom or unrecognized validator versions'
+}
+Note: Some nodes might run a minor version of any of the stated versions.
 */
 
 `;

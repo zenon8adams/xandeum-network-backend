@@ -3,7 +3,7 @@ import { findBestLeafNodeEndpoint } from '@/controllers/pnode.generative.control
 import { validateZod, catchAsync } from '@/middleware';
 import { findBestLeafNodeEndpointSchema } from '@/validators/generative.validator';
 import * as pnodeController from '@/controllers/pnode.controller';
-import { batchPodCheckSchema, runCommandQueryCheckSchema, runCommandQueryParamCheckSchema } from '@/validators/pnode.validator';
+import { batchPodCheckSchema, LeafQueryParamSchema, runCommandQueryCheckSchema, runCommandQueryParamCheckSchema } from '@/validators/pnode.validator';
 
 const router = Router();
 
@@ -37,7 +37,9 @@ router.get('/root', catchAsync(pnodeController.getRootNodeInfo));
  * @desc    Get leaf nodes information
  * @access  Public
 */
-router.get('/leaf', catchAsync(pnodeController.getLeafNodesInfo));
+router.get('/leaf',
+    validateZod({ query: LeafQueryParamSchema }),
+     catchAsync(pnodeController.getLeafNodesInfo));
 
 /**
  * @route   GET /api/v1/pnode/run-command/:command

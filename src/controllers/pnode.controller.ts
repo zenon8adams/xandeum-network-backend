@@ -192,11 +192,28 @@ export const getRootNodeInfo = async (
  * Returns detailed information about all pods
  */
 export const getLeafNodesInfo = async (
-  _req: Request,
+  req: TypedRequest<{ first_time?: boolean }>,
   res: Response
 ): Promise<void> => {
-  const connection = new PnodeConnection(config.pnodeClusterApi);
 
+  if (req.query && req.query.first_time) {
+    try {
+      const allNodes = await LeafNodeInfoModel.find({}).lean();
+      res.status(StatusCodes.OK).json({
+        status: 'success',
+        data: {
+          total: allNodes.length,
+          nodes: allNodes,
+        },
+      });
+
+      return;
+    } catch (err) {
+      
+    }
+  }
+
+  const connection = new PnodeConnection(config.pnodeClusterApi);
   const podsData = await connection.getPodsWithStats();
   const { pods } = podsData;
 
@@ -292,15 +309,11 @@ export const getLeafNodesInfo = async (
   const leafNodes = await Promise.all(leafNodesPromises);
 
   try {
-    await Promise.all(
-      leafNodes.map(async (node) => {
-        await LeafNodeInfoModel.findOneAndUpdate(
-          { pubkey: node.pubkey, 'address.endpoint': node.address.endpoint },
-          { ...node, queriedAt: new Date() },
-          { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
-      })
-    );
+    await LeafNodeInfoModel.deleteMany({});
+    const docs = leafNodes.map(node => ({ ...node, queriedAt: new Date() }));
+    if (docs.length > 0) {
+      await LeafNodeInfoModel.insertMany(docs, { ordered: false });
+    }
   } catch (err) {
     console.error('Failed to store leaf nodes for AI search:', err);
   }

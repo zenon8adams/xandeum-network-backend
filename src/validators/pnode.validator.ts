@@ -19,3 +19,9 @@ export const runCommandQueryCheckSchema = z.object({
 export const runCommandQueryParamCheckSchema = z.object({
     endpoint: z.string()
 });
+
+export const LeafQueryParamSchema = z.object({
+    first_time: z.enum(["true", "false"]).optional().transform((opt) => {
+        return opt === undefined ? opt : Boolean(opt);
+    })
+});
