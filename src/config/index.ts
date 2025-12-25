@@ -21,7 +21,7 @@ const envSchema = z.object({
       message: 'PORT must be between 1 and 65535',
     }),
   API_PREFIX: z.string().default('/api/v1'),
-  CORS_ORIGIN: z.string().default('*'),
+  CORS_ORIGIN: z.string().optional(),
   RATE_LIMIT_WINDOW_MS: z
     .string()
     .default('900000')

@@ -24,12 +24,14 @@ export const createApp = (): Express => {
   app.use(helmet());
 
   // CORS Configuration
-  app.use(
-    cors({
-      origin: config.corsOrigin,
-      credentials: true,
-    })
-  );
+  if(config.corsOrigin) {
+    app.use(
+      cors({
+        origin: config.corsOrigin,
+        credentials: true,
+      })
+    );
+  }
 
   // Body parsing Middleware
   app.use(express.json({ limit: '10mb' }));
