@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx --inspect --watch src/server.ts",
-    "build": "tsc",
-    "start": "node --import tsx dist/server.js",
+    "build": "tsc && tsc-alias -p tsconfig.json --resolve-full-paths",
+    "start": "node dist/server.js",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -40,6 +40,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.6",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.7.0",
     "typescript": "^5.9.3"
   }
