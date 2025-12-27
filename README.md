@@ -1,6 +1,6 @@
 # Xandeum Network Backend 🚀
 
-A TypeScript + Express backend that powers the [Xandeum](https://www.xandeum.network/) analytics dashboard frontend in this [repo](https://github.com/zenon8adams/xandeum-dashboard.git).
+A TypeScript + Express backend that powers the [Xandeum](https://www.xandeum.network/) analytics dashboard frontend in this [repo](https://github.com/zenon8adams/xandeum-dashboard.git).  You can visit the application at [xandeum-network.xyz](https://xandeum-network.xyz), because the domain name is similar to the official Xandeum domain, it may be mistakenly flagged as phishing. This is not the case, and we apologize for any confusion.
 
 **Key Features**
 
