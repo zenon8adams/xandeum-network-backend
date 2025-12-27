@@ -154,7 +154,9 @@ export const getRootNodeInfo = async (
 ): Promise<void> => {
   if (req.query && req.query.first_time) {
     try {
-      const cached = await RootNodeInfoModel.findOne({}).sort({ queriedAt: -1 }).lean();
+      const cached = await RootNodeInfoModel
+        .findOne({}).select('-__v -_id -createdAt -updatedAt -queriedAt')
+        .sort({ queriedAt: -1 }).lean();
       if (cached) {
         res.status(StatusCodes.OK).json({
           status: 'success',
@@ -222,7 +224,8 @@ export const getLeafNodesInfo = async (
 
   if (req.query && req.query.first_time) {
     try {
-      const allNodes = await LeafNodeInfoModel.find({}).lean();
+      const allNodes = await LeafNodeInfoModel.find({})
+      .select('-__v -_id -createdAt -updatedAt -queriedAt').lean();
       if(allNodes.length > 0) {
         res.status(StatusCodes.OK).json({
           status: 'success',

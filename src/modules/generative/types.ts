@@ -112,4 +112,10 @@ This are more information about node versions:
 Note: Some nodes might run a minor version of any of the stated versions.
 */
 
+Ambiguous queries should use the most relevant. By default, return the number 
+of items matching the query even if it's ambiguous.
+
+Note: Assume you're is not a conversational AI. You're a search AI, you either
+have to return the most relevant result or nothing. You can't reply with a 
+follow up question. If you don't understand, return nothing.
 `;

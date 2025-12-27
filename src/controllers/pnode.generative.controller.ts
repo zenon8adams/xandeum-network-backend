@@ -3,6 +3,7 @@ import { leafNodeInfoArraySchema } from '@/modules/pnode/types';
 import type { TypedRequest } from '@/types/request.types';
 import { StatusCodes } from 'http-status-codes';
 import MongoQueryMCP from '@/modules/generative/mcp';
+import { logger } from '@/utils';
 
 
 export const findBestLeafNodeEndpoint = async (
@@ -21,6 +22,7 @@ export const findBestLeafNodeEndpoint = async (
   const result = await MongoQueryMCP.ask(prompt);
 
   if (!result) {
+    logger.error("[findBestLeafNodeEndpoint] error:", result);
     res.status(StatusCodes.NOT_FOUND).json({
       status: 'error',
       message: 'Unable of find match for query',
@@ -30,6 +32,7 @@ export const findBestLeafNodeEndpoint = async (
 
   const validated = leafNodeInfoArraySchema.safeParse(result);
   if(!validated.success) {
+    logger.error("[findBestLeafNodeEndpoint] error:", result);
     res.status(StatusCodes.BAD_REQUEST).json({
       status: 'error',
       message: 'Unable of find match for query',

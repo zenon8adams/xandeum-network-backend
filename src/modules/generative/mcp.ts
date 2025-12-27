@@ -6,6 +6,7 @@ import { Client } from "@modelcontextprotocol/sdk/client";
 import { GoogleGenAI } from "@google/genai";
 import { PROMPT_PREFIX } from "./types";
 import { config } from "@/config";
+import { logger } from "@/utils";
 
 class MongoQueryMCP {
     private genAI: GoogleGenAI;
@@ -172,7 +173,8 @@ class MongoQueryMCP {
             async (arg) => {
                 try {
                     const { query } = arg;
-                    const result = await LeafNodeInfoModel.findOne(query);
+                    const result = await LeafNodeInfoModel.findOne(query)
+                        .select('-__v -_id -createdAt -updatedAt -queriedAt');
                     return {
                         content: [
                             {
@@ -235,7 +237,7 @@ class MongoQueryMCP {
 
             return response?.candidates?.[0]?.content?.parts?.[0]?.text;
         } catch (error) {
-            console.error("Error communicating with Gemini API:", error);
+            logger.error("Error communicating with Gemini API:", error);
             return "Sorry, I encountered an error while processing your request.";
         }
     }
