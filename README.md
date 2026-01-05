@@ -65,7 +65,7 @@ The app uses `dotenv` and validates expected variables at startup. Required vari
 - `RATE_LIMIT_WINDOW_MS` — window in ms for rate limiter (default 900000)
 - `RATE_LIMIT_MAX` — max requests per window (default 100)
 - `MONGODB_URI` — **required** MongoDB connection string
-- `REFERENCE_PNODE_URL` — your Xandeum pNode endpoint URL (testing used [Goole's Gemini AI](https://gemini.google.com/))
+- `REFERENCE_PNODE_URL` — your Xandeum pNode endpoint URL (testing used [Google's Gemini AI](https://gemini.google.com/))
 
 ---
 
